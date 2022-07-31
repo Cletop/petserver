@@ -1,0 +1,6 @@
+debug: true # enable debugging output
+server: 
+  host: localhost
+  port: 8080
+websocket:
+  port: 8088
