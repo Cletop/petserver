@@ -1,12 +1,17 @@
 package routes
 
 import (
+	"github.com/chagspace/petserver/middleware"
 	"github.com/chagspace/petserver/routes/v1"
 	"github.com/gin-gonic/gin"
 )
 
 func InitRoutes() {
 	router := gin.New()
+
+	// Cors
+	router.Use(middleware.Cors())
+
 	router.Use(gin.Recovery())
 	router.Use(gin.LoggerWithWriter(gin.DefaultWriter))
 
