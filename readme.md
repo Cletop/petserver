@@ -2,7 +2,7 @@
 
 this is the server code repository for the pet project
 
-### Run it?
+## Run it?
 
 **Clone And Install dependencies**
 
@@ -31,7 +31,7 @@ go run main.go
 go build -tags netgo -ldflags "-s -w" -0 app
 ```
 
-### How it was called?
+## How it was called?
 
 In other words: how to understand the calling process of this project code faster
 
