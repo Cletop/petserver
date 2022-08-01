@@ -6,6 +6,6 @@ import (
 )
 
 func ConnectPostgres() (db *gorm.DB, err error) {
-	dsn := "postgresql://localhost:5432/petserver?sslmode=disable"
+	dsn := "host=localhost user=postgres password=postgres dbname=petappdb port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 	return gorm.Open(postgres.Open(dsn), &gorm.Config{})
 }
