@@ -178,7 +178,9 @@ services:
       nofile:
         soft: 20000
         hard: 40000
-    volumes: # 将主机的数据卷或着文件挂载到容器里
+    volumes: # 将主机的数据卷或着文件挂载到容器里；
+      # 默认情况下数据将仅在容器中, 如果您决定删除容器，所有数据都将彻底消失
+      # 为了持久化数据，我们将使用 Docker 卷。它将与您计算机的本地文件夹共享容器内的数据库日期。这意味着每次您重新构建 Postgres Docker Compose 时，这些相同的数据都将用于当前项目
       - "/localhost/postgres.sock:/var/run/postgres/postgres.sock"
       - "/localhost/data:/var/lib/postgresql/data"
 
