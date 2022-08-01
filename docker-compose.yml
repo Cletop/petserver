@@ -1,10 +1,46 @@
-version: "3"
+version: "3.5"
 services:
   postgresql:
-    image: postgres:14.4
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+    # Set a name for the container so that it can be accessed by name on the same network
+    container_name: postgresql
+
+    # Official Postgres image from DockerHub (we use the last version)
+    image: postgres:latest
+
+    # ------------------------------------------------------------------------------
+    # Set environment variables for the container
+    # However, for security reasons, we will use .env instead
+    # environment:
+    #   POSTGRES_USER: postgres
+    #   POSTGRES_PASSWORD: postgres
+    # The PostgreSQL default database (automatically created at first launch)
+    #   POSTGRES_DB: petapp-db
+    #   PGDATA: /data/postgres # (the data directory)
+    # ------------------------------------------------------------------------------
+
+    env_file:
+      - .env
+
+    # # By default, a Postgres database is running on the 5432 port.
+    # If we want to access the database from our computer (outside the container),
+    # we must share the port with our computer's port.
+    # The syntax is [port we want on our machine]:[port we want to retrieve in the container]
+    # Note: You are free to change your computer's port,
+    # but take into consideration that it will change the way
+    # you are connecting to your database.
     ports:
-      - "5432:5432"
+      - 5432:5432
+    networks:
+      - postgres-networks
+    restart: unless-stopped
+
+    # we share the folder `postgresql-data` in our root repository, with the default PostgreSQL data path.
+    # It means that every time the repository is modifying the data inside
+    # of `/var/lib/postgresql/data/`, automatically the change will appear in `postgresql-data`.
+    # You don't need to create the `postgresql-data` folder. Docker Compose will do it for you.
+    # volumes:
+    # - ./postgresql-data:/var/lib/postgresql/data/
+
+networks:
+  postgres-networks:
+    driver: bridge
