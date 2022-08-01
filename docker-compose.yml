@@ -41,6 +41,19 @@ services:
     # volumes:
     # - ./postgresql-data:/var/lib/postgresql/data/
 
+  postgresadmin:
+    container_name: postgresadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@petapp.com
+      PGADMIN_DEFAULT_PASSWORD: pgadmin4
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    networks:
+      - postgres-networks
+    restart: unless-stopped
+
 networks:
   postgres-networks:
     driver: bridge
