@@ -23,6 +23,7 @@ func CreateUser(c *gin.Context) {
 		"code":     0,
 		"msg":      "success",
 		"username": user.Username,
+		"userId":   user.ID,
 	})
 }
 func UpdateUser(c *gin.Context) {}
