@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"fmt"
+
 	"github.com/chagspace/petserver/middleware"
 	"github.com/chagspace/petserver/routes/v1"
 	"github.com/gin-gonic/gin"
@@ -34,5 +36,7 @@ func InitRoutes() {
 }
 
 func startApp(ginEngine *gin.Engine) {
+	fmt.Printf("Starting server...: %s\n", "http://localhost:8080")
 	ginEngine.Run() // gin default 8080 port
+
 }
