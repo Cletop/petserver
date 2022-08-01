@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"io"
+
 	"github.com/chagspace/petserver/common"
 	"github.com/gin-gonic/gin"
 )
@@ -28,6 +30,20 @@ func Upgrade(c *gin.Context) {
 			return
 		}
 	}
+}
+
+// server-sent events
+func SSE(c *gin.Context) {
+	chanStream := make(chan int, 2)
+	go func() {
+		defer close(chanStream)
+	}()
+	c.Stream(func(w io.Writer) bool {
+		if msg, ok := <-chanStream; ok {
+			c.SSEvent("message", msg)
+		}
+		return false
+	})
 }
 
 // 从云端获取消息
