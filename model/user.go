@@ -4,9 +4,9 @@ import "gorm.io/gorm"
 
 type UserModel struct {
 	gorm.Model
-	Username string `gorm:"username"`
-	Password string `gorm:"password"`
-	Email    string `gorm:"email"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
 }
 
 func (UserModel) TableName() string {

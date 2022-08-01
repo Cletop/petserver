@@ -1,6 +1,9 @@
 package controller
 
 import (
+	"log"
+	"net/http"
+
 	"github.com/chagspace/petserver/model"
 	"github.com/chagspace/petserver/service"
 	"github.com/gin-gonic/gin"
@@ -8,13 +11,19 @@ import (
 
 func GetUsers(c *gin.Context) {}
 func GetUser(c *gin.Context)  {}
+
 func CreateUser(c *gin.Context) {
-	user := &model.UserModel{
-		Username: c.PostForm("username"),
-		Password: c.PostForm("password"),
-		Email:    c.PostForm("email"),
-	}
+	user := &model.UserModel{}
+	c.BindJSON(&user)
+	log.Printf("%v", user)
+
 	service.CreateUser(user)
+
+	c.JSON(http.StatusOK, gin.H{
+		"code":     0,
+		"msg":      "success",
+		"username": user.Username,
+	})
 }
 func UpdateUser(c *gin.Context) {}
 func DeleteUser(c *gin.Context) {}
