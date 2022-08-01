@@ -1,0 +1,198 @@
+# docker-compose 基本知识
+version: "3.4" # 使用什么版本的 compose
+services:
+  serviceName: # 服务的名称, 可以自定义
+    image: "imageName" # 使用的镜像,
+    # image: "redis:alpine" # 使用 DockerHub 的redis 镜像
+  web-service:
+    # build: ./web # 指定构建镜像的上下文环境; 这里为指定为 ./web/Dockerfile 所构建的镜像
+    # 或者，可配置的方式
+    build:
+      context: ./web # 上下文路径
+      dockerfile: MyDockerfile # 指定构建镜像的Dockerfile文件名
+      args: # 添加构建参数, 这是只能在构建过程中访问的环境变量
+        runtimeEnv: dev # 比如这就是一个环境变量, 可以在构建过程中访问
+      labels: # 设置构建的标签
+        - "com.xxxx.x=xxxx"
+      target: prod # 多层构建时，可以指定构建哪一层
+    container_name: # 容器的名称
+    depends_on: # 依赖关系
+      - db-server
+      - redis-server
+      # 启用依赖关系后，docker-compose up 启动时候有以下情况
+      # 1. docker-compose up 以依赖的顺序启动, 先启动 db-server, 然后启动 redis-server, 最后启动 web-service
+      # 2. docker-compose up SERVICE 自动包含SERVICE的依赖项。
+      # 比如 docker-compose up web-service, 然后还将会创建并启动 db-server 和 redis-server
+      # docker-compose stop 安照以来关系停止服务； web-service 在 db-server 和 redis-server 后停止
+
+    cgroup_parent: my-xxxx
+    # 为容器指定父 cgroup 组，意味着将继承该组的资源限制
+    # ref: https://medium.com/@asishrs/docker-limit-resource-utilization-using-cgroup-parent-72a646651f9d
+
+    # 覆盖容器启动时候的执行命令
+    command: ["/bin/bash", "-c", "echo 'hello world'"] # 容器启动时执行的命令
+    cap_add: # 添加容器拥有宿主机的内核功能
+      - ALL # 开启全部权限
+      - NET_ADMIN # 开启网络管理权限
+    cap_drop: # 删除容器拥有宿主机的内核功能
+      - SYS_PTRACE # 关闭 ptrace权限
+
+    deploy: # 指定与服务运行和部署有关的配置, 仅在 swarm 模式工作
+      endpoint_mode:
+        dnsrr # 访问集群的方式
+        # 可选值: dnsrr, vip, none
+        # vip: 集群服务队外一个 虚拟ip, 所有请求通过该 虚拟ip 访问到集群内部的机器
+        # dnsrr: DNS轮询，所有的请求会自动轮询获取到集群 ip 列表中的一个 ip 地址，通过该 ip 进行访问
+      labels: # 设置服务的标签, 可以用容器上的 labels（跟 deploy 同级的配置） 覆盖 deploy 下的 labels
+        description: "this is a web server"
+      mode:
+        replicated # 指定服务提供的模式
+        # replicated: 复制服务, 将指定的服务复制到集群上
+        # global：全局服务, 将指定的服务放到集群上的所有机器上（服务将部署至集群的每个节点）
+      replicas: 6 # mode 为 replicated 时，使用此参数配置具体运行的节点数量
+      resources: # 配置服务器资源使用的限制
+        limits:
+          cpu: 100m
+          memory: 100M
+        reservations:
+          cpu: 50m
+          memory: 50M
+      restart_policy: # 配置在退出容器时如何重新启动容器
+        condition: any # 可选 none，on-failure 或者 any（默认值：any）
+        delay: 5s # 设置多久之后重启（默认值：0）
+        max_attempts: 3 # 尝试重新启动容器的次数，超出次数，则不再尝试（默认值：一直重试, 直到成功）
+        window: 120s # 设置容器重启超时时间
+      rollback_config: # 配置在更新失败的情况下应如何回滚服务
+        parallelism: 0 # 一次要回滚的容器数。如果设置为0，则所有容器将同时回滚
+        delay: 2s # 每个容器组回滚之间等待的时间（默认为0s）
+        failure_action: pause # 如果回滚失败，该怎么办。其中一个 continue 或者 pause（默认pause）
+        monitor: 0s # 每个容器更新后，持续观察是否失败了的时间 (ns|us|ms|s|m|h)（默认为0s）
+        max_failure_ratio: 0 # 在回滚期间可以容忍的故障率（默认为0）
+        order: stop-first # 回滚期间的操作顺序。其中一个 stop-first（串行回滚），或者 start-first（并行回滚）（默认 stop-first ）
+      update_config: # 配置如何更新服务, 对配置滚动更新很有用
+        parallelism: 0 # 一次更新的容器数
+        delay: 2s # 在更新一组容器之间等待的时间。
+        failure_action: pause # 如果更新失败，该怎么办。其中一个 continue，rollback 或者pause （默认：pause）。
+        monitor: 0s # 每个容器更新后，持续观察是否失败了的时间 (ns|us|ms|s|m|h)（默认为0s）。
+        max_failure_ratio: 0 #在更新过程中可以容忍的故障率。
+        order: stop-first # 回滚期间的操作顺序。其中一个 stop-first（串行回滚），或者 start-first（并行回滚）（默认stop-first）
+    devices: # 指定设备映射列表
+      - /dev/sda:/dev/xvda:rw # 指定设备映射
+      - /dev/sdb:/dev/xvdb:r # 指定设备映射
+    # dns: 9.9.9.9 # 指定DNS服务器
+    dns: # 指定 DNS 服务器列表
+      - 127.0.0.1
+      - 8.8.8.8
+    # dns_search: example.com # 指定搜索的DNS域
+    dns_search: # 指定 DNS 搜索域列表
+      - example.com
+      - example.net
+    # entrypoint: /code/entrypoint.sh # 覆盖容器默认的 entrypoint
+    entrypoint: # 覆盖容器默认的 entrypoint
+      - php
+      - -d
+      - zend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20100525/xdebug.so
+    # env_file: .env # 指定环境变量文件
+    env_file: # 指定环境变量文件
+      - ./common.env
+      - ./apps/web.env
+      - /opt/secrets.env
+    environment: # 添加环境变量。您可以使用数组或字典、任何布尔值，布尔值需要用引号引起来，以确保 YML 解析器不会将其转换为 True 或 False
+      RACK_ENV: development
+      SHOW: "true"
+    expose: # 暴露端口，但不映射到宿主机，只被连接的服务访问, 仅可以指定内部端口为参数
+      - "3000"
+      - "8000"
+    extra_hosts: # 添加主机名映射。类似 docker client --add-host
+      - "somehost:162.242.195.82"
+      - "otherhost:50.31.209.229"
+      # 以上会在此服务的内部容器中 /etc/hosts 创建一个具有 ip 地址和主机名的映射关系：
+      # 162.242.195.82  somehost
+      # 50.31.209.229   otherhost
+    healthcheck: # 用于检测 docker 服务是否健康运行
+      test: ["CMD", "curl", "-f", "http://localhost"] # 设置检测程序
+      interval: 1m30s # 设置检测间隔
+      timeout: 10s # 设置检测超时时间
+      retries: 3 # 设置重试次数
+      start_period: 40s # 启动后，多少秒开始启动检测程序
+    image: # 指定容器使用的镜像
+      image: redis
+      # image: ubuntu:14.04
+      # image: tutum/influxdb
+      # image: example-registry.com:4000/postgresql
+      # image: a4bc65fd # 镜像id
+    logging: # 服务的日志记录配置
+      driver:
+        "json-file" # 定服务容器的日志记录驱动程序，默认值为json-file
+        # 可选项：json-file、syslog、none
+
+      options:
+        # 仅在 json-file 驱动程序下，可以使用以下参数，限制日志得数量和大小
+        # 当达到文件限制上限，会自动删除旧得文件
+        max-size: "200K" # 单个文件大小为200k
+        max-file: "10" # 最多10个文件
+
+        # syslog 驱动程序下，可以使用 syslog-address 指定日志接收地址
+        syslog-address: "tcp://192.168.0.42:123"
+    network_mode: bridge # 设置网络模式
+    # 可配： bridge host none service:[service name] container:[container name/id]
+    networks: # 配置容器连接的网络，引用顶级 networks 下的条目
+      some-network:
+        aliases:
+          - alias1
+      other-network:
+        aliases:
+          - alias2
+    aliases: # 容器的别名, 同一网络上的其他容器可以使用服务名称或此别名来连接到对应容器的服务
+      - alias1
+      - alias2
+    restart:
+      "no" # 是默认的重启策略，在任何情况下都不会重启容器，非 swarm 集群模式使用; 如果 swarm 集群模式请改用 restart_policy
+      # restart: always # 容器总是重新启动
+      # restart: on-failure # 在容器非正常退出时（退出状态非0），才会重启容器
+      # restart: unless-stopped # 在容器退出时总是重启容器，但是不考虑在Docker守护进程启动时就已经停止了的容器
+    secrets: # 存储敏感数据
+      my_secret:
+        file: ./my_secret.txt
+    security_opt: # 修改容器默认的 schema 标签
+      - label:user:USER # 设置容器的用户标签
+      - label:role:ROLE # 设置容器的角色标签
+      - label:type:TYPE # 设置容器的安全策略标签
+      - label:level:LEVEL # 设置容器的安全等级标签
+    stop_grace_period: 1s # 指定在容器无法处理 SIGTERM (或者任何 stop_signal 的信号)，等待多久后发送 SIGKILL 信号关闭容器
+    # stop_grace_period: 1m30s # 等待 1 分 30 秒
+    stop_signal: SIGUSR1 # 设置停止容器的替代信号。默认情况下使用 SIGTERM， 这里是使用 SIGUSR1 替代信号 SIGTERM 来停止容器
+    sysctls: # 设置容器中的内核参数，可以使用数组或字典格式
+      sysctls:
+        net.core.somaxconn: 1024
+        net.ipv4.tcp_syncookies: 0
+      # sysctls:
+      # - net.core.somaxconn=1024
+      # - net.ipv4.tcp_syncookies=0
+    tmpfs: /run # 在容器内安装一个临时文件系统。可以是单个值或列表的多个值
+    # tmpfs:
+    #  - /run
+    #  - /tmp
+    ulimits: # 覆盖容器默认的 ulimit
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+    volumes: # 将主机的数据卷或着文件挂载到容器里
+      - "/localhost/postgres.sock:/var/run/postgres/postgres.sock"
+      - "/localhost/data:/var/lib/postgresql/data"
+
+  db-server:
+    # ....
+  redis-server:
+    # ....
+networks:
+  some-network:
+    # Use a custom driver
+    driver: custom-driver-1
+  other-network:
+    # Use a custom driver which takes special options
+    driver: custom-driver-2
+# 编排
+# docker-compose up -d
+# -d: 让其在后台执行

@@ -1,6 +1,6 @@
-FROM golang:1.17.2
+FROM golang:1.18.2
 
-WORKDIR /petserver
-COPY . .
+WORKDIR /pet-server
+COPY ..
 
 RUN go mod download
