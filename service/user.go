@@ -30,15 +30,15 @@ func DeleteUser() {
 	db.Where("id", 20).Delete(&model.UserModel{}) // 删除 id 为 20 的用户
 }
 
-func Login(username, password string) (uint, bool) {
-	user, presence := GetUser(username, password)
-	return user.ID, presence
+func Login(username string, password string) bool {
+	// user, presence := GetUser(username, password)
+	return true
 }
 
-func GetUser(username string, password string) (*model.UserModel, bool) {
+func GetUser(username string) (*model.UserModel, bool) {
 	db := database.GlobalDB
 	user := &model.UserModel{}
-	err := db.Where("username = ? AND password = ?", username, password).First(user).Error
+	err := db.Where("username = ?", username).First(user).Error
 	if err == gorm.ErrRecordNotFound {
 		return nil, false
 	}
