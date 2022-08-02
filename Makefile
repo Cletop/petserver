@@ -15,6 +15,10 @@ clean:
 	rm ${BUILD_NAME}-darwin ${BUILD_NAME}-linux ${BUILD_NAME}-windows
 
 # start postgres(docker-compose) and go server
+docker-upd:
+	docker-compose up -d
+docker-down:
+	docker-compose down
 dev:
 	docker-compose up -d
 	go run main.go
