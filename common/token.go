@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/chagspace/petserver/database"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 func CreateToken(user_id uint, username string) (string, error) {
