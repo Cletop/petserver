@@ -28,3 +28,8 @@ func DeleteUser() {
 	db.Delete(&model.UserModel{}, 20)             // 删除 id 为 20 的用户
 	db.Where("id", 20).Delete(&model.UserModel{}) // 删除 id 为 20 的用户
 }
+
+func Login(username, password string) bool {
+	// TODO: 校验用户名和密码
+	return true
+}

@@ -1,5 +1,5 @@
 package middleware
 
-func jwt_middleware() {
+func JWT() {
 	// TODO:
 }
