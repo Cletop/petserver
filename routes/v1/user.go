@@ -15,7 +15,7 @@ func InitUserRouter(user_router *gin.RouterGroup) {
 	user_router.POST("/users/subscribe/:id", controller.SubscribeUser)
 	user_router.POST("/users/unsubscribe/:id", controller.UnsubscribeUser)
 
-	user_router.POST("/users/notify/:id", controller.NotifyUser)
+	user_router.POST("/users/notify", controller.NotifyUser)
 
 	user_router.POST("/users/login", controller.Login)
 }

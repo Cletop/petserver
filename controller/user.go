@@ -32,15 +32,45 @@ func CreateUser(c *gin.Context) {
 	})
 }
 
-func UpdateUser(c *gin.Context) {}
-func DeleteUser(c *gin.Context) {}
+func UpdateUser(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"code":    0,
+		"msg":     "success",
+		"message": "update_user",
+	})
+}
+func DeleteUser(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"code":    0,
+		"msg":     "success",
+		"message": "delete_user",
+	})
+}
 
 // subscribe a user
-func SubscribeUser(c *gin.Context)   {}
-func UnsubscribeUser(c *gin.Context) {}
+func SubscribeUser(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"code":    0,
+		"msg":     "success",
+		"message": "subscribe_user",
+	})
+}
+func UnsubscribeUser(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"code":    0,
+		"msg":     "success",
+		"message": "unsubscribe_user",
+	})
+}
 
 // notify  a user
-func NotifyUser(c *gin.Context) {}
+func NotifyUser(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"code":    0,
+		"msg":     "success",
+		"message": "notify_user",
+	})
+}
 
 // Login user
 func Login(c *gin.Context) {

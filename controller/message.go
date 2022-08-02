@@ -2,6 +2,7 @@ package controller
 
 import (
 	"io"
+	"net/http"
 
 	"github.com/chagspace/petserver/common"
 	"github.com/gin-gonic/gin"
@@ -48,7 +49,7 @@ func SSE(c *gin.Context) {
 
 // 从云端获取消息
 func GetMessages(c *gin.Context) {
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"message": "get_messages",
 	})
 }
@@ -56,4 +57,7 @@ func GetMessages(c *gin.Context) {
 // 像订阅者推送一条消息
 func PublishMessage(c *gin.Context) {
 	// TODO：
+	c.JSON(http.StatusOK, gin.H{
+		"message": "publish_message",
+	})
 }
