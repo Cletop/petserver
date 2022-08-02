@@ -44,13 +44,12 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"code": 1, "msg": err.Error()})
 		return
 	}
-	allowed_user := service.Login(user.Username, user.Password)
+	user_id, allowed_user := service.Login(user.Username, user.Password)
 	if !allowed_user {
 		c.JSON(http.StatusUnauthorized, gin.H{"code": 1, "msg": "unauthorized"})
 		return
 	}
-
-	token, err := common.CreateToken(user.ID, user.Username)
+	token, err := common.CreateToken(user_id, user.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 1, "msg": err.Error()})
 		return
@@ -61,7 +60,7 @@ func Login(c *gin.Context) {
 		"msg":      "success",
 		"token":    token,
 		"username": user.Username,
-		"userId":   user.ID,
+		"userId":   user_id,
 	})
 }
 

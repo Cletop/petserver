@@ -30,9 +30,9 @@ func DeleteUser() {
 	db.Where("id", 20).Delete(&model.UserModel{}) // 删除 id 为 20 的用户
 }
 
-func Login(username, password string) bool {
-	_, presence := GetUser(username, password)
-	return presence
+func Login(username, password string) (uint, bool) {
+	user, presence := GetUser(username, password)
+	return user.ID, presence
 }
 
 func GetUser(username string, password string) (*model.UserModel, bool) {
