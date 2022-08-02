@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/chagspace/petserver/database"
 	"github.com/chagspace/petserver/model"
+	"gorm.io/gorm"
 )
 
 func CreateUser(user *model.UserModel) {
@@ -30,6 +31,16 @@ func DeleteUser() {
 }
 
 func Login(username, password string) bool {
-	// TODO: 校验用户名和密码
-	return true
+	_, presence := GetUser(username, password)
+	return presence
+}
+
+func GetUser(username string, password string) (*model.UserModel, bool) {
+	db := database.GlobalDB
+	user := &model.UserModel{}
+	err := db.Where("username = ? AND password = ?", username, password).First(user).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, false
+	}
+	return user, true
 }
