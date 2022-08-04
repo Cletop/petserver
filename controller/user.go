@@ -10,8 +10,20 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func GetUsers(c *gin.Context) {}
-func GetUser(c *gin.Context)  {}
+func GetUsers(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"code":    0,
+		"msg":     "success",
+		"message": "get_users",
+	})
+}
+func GetUser(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"code":    0,
+		"msg":     "success",
+		"message": "get_user",
+	})
+}
 
 func CreateUser(c *gin.Context) {
 	user := &model.UserModel{}

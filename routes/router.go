@@ -13,7 +13,6 @@ func InitRoutes() {
 
 	// Cors
 	router.Use(middleware.Cors())
-
 	router.Use(gin.Recovery())
 	router.Use(gin.LoggerWithWriter(gin.DefaultWriter))
 
