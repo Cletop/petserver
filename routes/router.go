@@ -11,8 +11,11 @@ import (
 func InitRoutes() {
 	router := gin.New()
 
+	// Filter Backlist Ip
+	router.Use(middleware.Backlist())
 	// Cors
 	router.Use(middleware.Cors())
+
 	router.Use(gin.Recovery())
 	router.Use(gin.LoggerWithWriter(gin.DefaultWriter))
 

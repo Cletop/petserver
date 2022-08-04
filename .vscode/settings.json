@@ -3,6 +3,7 @@
         "chagspace",
         "gonic",
         "gorm",
+        "lishiwen",
         "petserver"
     ]
 }
