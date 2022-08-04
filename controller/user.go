@@ -29,6 +29,27 @@ func CreateUser(c *gin.Context) {
 	user := &model.UserModel{}
 	c.BindJSON(&user)
 
+	// check if username exists
+	if user.Username == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":   1,
+			"msg":    "username is required",
+			"status": "error",
+		})
+		return
+	}
+
+	// check if username is exists in database
+	database_user, exist_user := service.GetUser(user.Username)
+	if exist_user && database_user.Username == user.Username {
+		c.JSON(http.StatusOK, gin.H{
+			"code":   1,
+			"msg":    "username already exists",
+			"status": "error",
+		})
+		return
+	}
+
 	password, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	user.Password = string(password)
 
