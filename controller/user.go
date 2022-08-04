@@ -101,7 +101,7 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"code": 1, "msg": "unauthorized"})
 		return
 	}
-	token, err := common.CreateToken(database_user.ID, user.Username)
+	token, err := common.CreateToken(uint(database_user.UID), user.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 1, "msg": err.Error()})
 		return
