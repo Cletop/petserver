@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/chagspace/petserver/common"
+	"github.com/chagspace/petserver/database"
 	"github.com/chagspace/petserver/model"
 	"github.com/chagspace/petserver/service"
 	"github.com/gin-gonic/gin"
@@ -108,33 +109,39 @@ func NotifyUser(c *gin.Context) {
 // Login user
 func Login(c *gin.Context) {
 	var user model.UserModel
+
+	// try parser to json
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"code": 1, "msg": err.Error()})
 		return
 	}
+
+	// note:
+	// because of the uniqueness of the user name, the password of the first user found is hashed with the current password
 	database_user, allowed_user := service.GetUser(user.Username)
+	if !allowed_user {
+		c.JSON(http.StatusUnauthorized, gin.H{"code": 1, "msg": "unauthorized"})
+		return
+	}
 	password_error := bcrypt.CompareHashAndPassword([]byte(database_user.Password), []byte(user.Password))
 	if password_error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"code": 1, "msg": "password error"})
 		return
 	}
-	if !allowed_user {
-		c.JSON(http.StatusUnauthorized, gin.H{"code": 1, "msg": "unauthorized"})
-		return
-	}
+
+	// generate tokens (JWT)
 	token, err := common.CreateToken(uint(database_user.UID), user.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 1, "msg": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"code":     0,
-		"msg":      "success",
-		"token":    token,
-		"username": user.Username,
-		"userId":   database_user.ID,
-		"uid":      database_user.UID,
-	})
+
+	// set token to cookies and enable httpOnly
+	common.SetHttpOnlyCookie(c, "access_token", token, 3600)
+	// set token to redis
+	database.GlobalRedis.Set(token, database_user.UID, 3600)
+
+	c.JSON(http.StatusOK, gin.H{"code": 0, "msg": "success", "username": user.Username, "uid": database_user.UID})
 }
 
 func Logout(c *gin.Context) {}

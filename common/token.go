@@ -4,7 +4,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/chagspace/petserver/database"
 	"github.com/golang-jwt/jwt/v4"
 )
 
@@ -22,8 +21,6 @@ func CreateToken(user_id uint, username string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	database.ConnectRedis().Set(token, user_id, time.Minute*15)
 
 	return token, nil
 }
