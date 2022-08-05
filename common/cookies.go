@@ -4,6 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var AccessToken string = "access_token"
+var AuthTokenMaxAge int = 7 * 60 * 60 * 24
+
 func SetHttpOnlyCookie(ctx *gin.Context, key, value string, maxAge int) {
 	// Set HttpOnly cookie
 
@@ -31,4 +34,15 @@ func SetSecureCookie(ctx *gin.Context, key, value string, maxAge int) {
 	// Set secure cookies
 	// only allow at https requests and not allow javascript access/modification
 	ctx.SetCookie(key, value, maxAge, "/", origin, true, true)
+}
+
+func SetAuthCookie(ctx *gin.Context, value string) {
+	// Set Auth cookie
+	SetSecureCookie(ctx, AccessToken, value, AuthTokenMaxAge)
+}
+
+func GetAuthCookie(ctx *gin.Context) (string, error) {
+	// Get cookie value
+	cookie, err := ctx.Cookie(AccessToken)
+	return cookie, err
 }

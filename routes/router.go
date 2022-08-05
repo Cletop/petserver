@@ -24,6 +24,7 @@ func InitRoutes() {
 	})
 
 	v1_router := router.Group("/api/v1")
+	v1_router.Use(middleware.JWTAuth())
 	// v1_router.Use(AuthRequired())
 	{
 		// account

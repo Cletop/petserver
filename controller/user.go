@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/chagspace/petserver/common"
 	"github.com/chagspace/petserver/database"
@@ -137,9 +138,9 @@ func Login(c *gin.Context) {
 	}
 
 	// set token to cookies and enable httpOnly
-	common.SetHttpOnlyCookie(c, "access_token", token, 3600)
+	common.SetAuthCookie(c, token)
 	// set token to redis
-	database.GlobalRedis.Set(token, database_user.UID, 3600)
+	database.GlobalRedis.Set(token, database_user.UID, time.Duration(common.AuthTokenMaxAge))
 
 	c.JSON(http.StatusOK, gin.H{"code": 0, "msg": "success", "username": user.Username, "uid": database_user.UID})
 }

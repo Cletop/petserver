@@ -1,6 +1,11 @@
 debug: true # enable debugging output
-server: 
+server:
   host: localhost
   port: 8080
 websocket:
   port: 8088
+
+cookies:
+  secret: "secret"
+  # 过期时间
+  expiration_time: 60 * 60 * 24 * 7 # 7 days
