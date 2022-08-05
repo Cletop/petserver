@@ -137,12 +137,17 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// set token to cookies and enable httpOnly
+	// save token to cookies and enable httpOnly
 	common.SetAuthCookie(c, token)
-	// set token to redis
+	// save jwt token to redis
 	database.GlobalRedis.Set(token, database_user.UID, time.Duration(common.AuthTokenMaxAge))
 
-	c.JSON(http.StatusOK, gin.H{"code": 0, "msg": "success", "username": user.Username, "uid": database_user.UID})
+	c.JSON(http.StatusOK, gin.H{
+		"code":     0,
+		"msg":      "success",
+		"username": user.Username,
+		"uid":      database_user.UID,
+	})
 }
 
 func Logout(c *gin.Context) {}

@@ -49,6 +49,7 @@ func JWTAuth() gin.HandlerFunc {
 
 		// verify tokens
 		user_id, username, err := common.VerifyToken(value)
+
 		if err != nil {
 			ctx.JSON(http.StatusUnauthorized, gin.H{
 				"code":   1,

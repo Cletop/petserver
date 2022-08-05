@@ -1,6 +1,9 @@
 package common
 
 import (
+	"net/http"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -11,7 +14,8 @@ func SetHttpOnlyCookie(ctx *gin.Context, key, value string, maxAge int) {
 	// Set HttpOnly cookie
 
 	// only allow cross-origin requests from the same origin to prevent CSRF attacks
-	origin := ctx.Request.Header.Get("Origin")
+	domain := strings.Split(strings.Split(ctx.Request.Header.Get("Origin"), ":")[1], "//")[1] // real domain
+	// host := ctx.Request.Host                                          // hostname ,proxy server hostname
 
 	/**
 	* key: cookie name
@@ -22,7 +26,8 @@ func SetHttpOnlyCookie(ctx *gin.Context, key, value string, maxAge int) {
 	* secure: cookie secure flag (only HTTPS)
 	* httpOnly: cookie http only flag (Do not allow javascript access/modification)
 	 */
-	ctx.SetCookie(key, value, maxAge, "/", origin, false, true)
+	ctx.SetSameSite(http.SameSiteLaxMode)
+	ctx.SetCookie(key, value, maxAge, "/", domain, false, true)
 }
 
 func SetSecureCookie(ctx *gin.Context, key, value string, maxAge int) {
@@ -38,7 +43,7 @@ func SetSecureCookie(ctx *gin.Context, key, value string, maxAge int) {
 
 func SetAuthCookie(ctx *gin.Context, value string) {
 	// Set Auth cookie
-	SetSecureCookie(ctx, AccessToken, value, AuthTokenMaxAge)
+	SetHttpOnlyCookie(ctx, AccessToken, value, AuthTokenMaxAge)
 }
 
 func GetAuthCookie(ctx *gin.Context) (string, error) {

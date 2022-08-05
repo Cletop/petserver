@@ -13,14 +13,11 @@ func CreateToken(user_id uint, username string) (string, error) {
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.MapClaims{
 		"user_id":  user_id,
 		"username": username,
-		"exp":      AuthTokenMaxAge,
+		"exp":      time.Now().Add(time.Hour * 24 * 7).Unix(), // 7 days
 		"iat":      time.Now().Unix(),
 		"nbf":      time.Now().Unix(),
 		"jti":      user_id,
 		"sub":      "petserver_auth",
-
-		// "aud":      "petserver",
-		// "iss":      "petserver",
 	})
 
 	token, err := at.SignedString([]byte(os.Getenv("JWT_SECRET")))
