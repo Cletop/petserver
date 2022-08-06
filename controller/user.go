@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/chagspace/petserver/common"
 	"github.com/chagspace/petserver/model"
@@ -17,12 +18,20 @@ func GetUsers(c *gin.Context) {
 		"message": "get_users",
 	})
 }
+
 func GetUser(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"code":    0,
-		"msg":     "success",
-		"message": "get_user",
-	})
+	user_id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, common.StatusBadRequestMessage("invalid user id"))
+		return
+	}
+
+	user, isRecord := service.GetUserByUID(uint(user_id))
+	if !isRecord {
+		c.JSON(http.StatusOK, common.StatusOKMessage(gin.H{"user": nil}, "user not found"))
+		return
+	}
+	c.JSON(http.StatusOK, common.StatusOKMessage(gin.H{"user": user}, "get user success"))
 }
 
 func CreateUser(c *gin.Context) {

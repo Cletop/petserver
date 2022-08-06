@@ -5,15 +5,17 @@ import (
 )
 
 const (
-	StatusSuccessCode = 10000 // success
-	StatusFailureCode = 10001 // failed
-	StatusErrorCode   = 10002 // internal error
+	StatusSuccessCode       = 10000 // success
+	StatusFailureCode       = 10001 // failed
+	StatusErrorCode         = 10002 // internal error
+	StatusRequestedSelfCode = 10003 // requested self
 )
 const (
-	StatusSuccess      = "success"
-	StatusError        = "error"
-	StatusUnauthorized = "unauthorized"
-	StatusFailure      = "failure"
+	StatusSuccess       = "success"
+	StatusError         = "error"
+	StatusUnauthorized  = "unauthorized"
+	StatusFailure       = "failure"
+	StatusRequestedSelf = "requested_self"
 )
 
 type StandardMessage struct {
@@ -50,4 +52,7 @@ func StatusOKMessage(content map[string]any, msg string) gin.H {
 		Msg:     msg,
 		Content: content,
 	})
+}
+func StatusRequestedSelfMessage(msg string) gin.H {
+	return FormatMessageBody(StandardMessage{Code: StatusRequestedSelfCode, Status: StatusRequestedSelf, Msg: msg})
 }

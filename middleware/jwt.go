@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/chagspace/petserver/common"
 	"github.com/gin-gonic/gin"
@@ -70,6 +71,40 @@ func JWTAuth() gin.HandlerFunc {
 			ctx.Set("user_id", user_id)
 			ctx.Set("username", username)
 			ctx.Next()
+		}
+	}
+}
+
+func RequestedSelfGet(relationKey string) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// NOTE: 前面的全局过滤器已经验证了Token合法性，这里只需要验证是否是自己的请求
+		token, _ := ctx.Cookie(common.AccessToken)
+		access_token_user_id, access_token_username, _ := common.VerifyToken(token)
+
+		var err bool = false
+
+		if relationKey == "uid" {
+			id, _ := strconv.ParseUint(ctx.Param("id"), 10, 64)
+			if uint(id) != access_token_user_id {
+				err = true
+			}
+		}
+
+		if relationKey == "username" {
+			username := ctx.Param("username")
+			if username != access_token_username {
+				err = true
+			}
+		}
+
+		if !err {
+			ctx.Next()
+		} else {
+			// 只允许访问自己的信息
+			ctx.JSON(
+				http.StatusUnauthorized,
+				common.StatusRequestedSelfMessage("exceeding access boundaries, allowing access only to your own resources"),
+			)
 		}
 	}
 }
