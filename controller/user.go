@@ -2,10 +2,8 @@ package controller
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/chagspace/petserver/common"
-	"github.com/chagspace/petserver/database"
 	"github.com/chagspace/petserver/model"
 	"github.com/chagspace/petserver/service"
 	"github.com/gin-gonic/gin"
@@ -109,11 +107,27 @@ func NotifyUser(c *gin.Context) {
 
 // Login user
 func Login(c *gin.Context) {
-	var user model.UserModel
+	// check if user is already logged in and redirect to home page
+	access_token, refresh_token, cookie_completed := common.GetRenewableCookies(c)
+	if cookie_completed {
+		access_user_id, access_username, access_token_error := common.VerifyToken(access_token)
+		_, _, refresh_token_error := common.VerifyToken(refresh_token)
+		if access_token_error == nil && refresh_token_error == nil {
+			// user is already logged in and has a valid token and refresh token
+			c.JSON(http.StatusFound, common.StatusOKMessage(gin.H{
+				"uid":      access_user_id,
+				"username": access_username,
+			}, "user is already logged in and has a valid token"))
+			return
+		}
+	}
 
-	// try parser to json
+	var user model.UserModel
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"code": 1, "msg": err.Error()})
+		c.JSON(
+			http.StatusBadRequest,
+			common.StatusBadRequestMessage("failed deserialization attempt, check request parameters"),
+		)
 		return
 	}
 
@@ -121,33 +135,25 @@ func Login(c *gin.Context) {
 	// because of the uniqueness of the user name, the password of the first user found is hashed with the current password
 	database_user, allowed_user := service.GetUser(user.Username)
 	if !allowed_user {
-		c.JSON(http.StatusUnauthorized, gin.H{"code": 1, "msg": "unauthorized"})
+		c.JSON(
+			http.StatusUnauthorized,
+			common.StatusUnauthorizedMessage("username or password is incorrect"),
+		)
 		return
 	}
-	password_error := bcrypt.CompareHashAndPassword([]byte(database_user.Password), []byte(user.Password))
-	if password_error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"code": 1, "msg": "password error"})
+	if common.VerifyPassword(database_user.Password, user.Password) != nil {
+		c.JSON(http.StatusBadRequest, common.StatusBadRequestMessage("invalid account or password"))
 		return
 	}
-
-	// generate tokens (JWT)
-	token, err := common.CreateToken(uint(database_user.UID), user.Username)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"code": 1, "msg": err.Error()})
+	// set token to cookies
+	isOk := common.UpdateStorageAuthToken(c, database_user.UID, user.Username)
+	if !isOk {
 		return
 	}
-
-	// save token to cookies and enable httpOnly
-	common.SetAuthCookie(c, token)
-	// save jwt token to redis
-	database.GlobalRedis.Set(token, database_user.UID, time.Duration(common.AuthTokenMaxAge))
-
-	c.JSON(http.StatusOK, gin.H{
-		"code":     0,
-		"msg":      "success",
-		"username": user.Username,
+	c.JSON(http.StatusOK, common.StatusOKMessage(gin.H{
 		"uid":      database_user.UID,
-	})
+		"username": user.Username,
+	}, ""))
 }
 
 func Logout(c *gin.Context) {}

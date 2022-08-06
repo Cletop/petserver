@@ -7,25 +7,27 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-func CreateToken(user_id uint, username string) (string, error) {
-	var err error
+// access token expire time
+var AccessTokenExpireTime = time.Now().Add(time.Minute * 10)    // 10 minutes
+var RefreshTokenExpireTime = time.Now().Add(time.Hour * 24 * 7) // 7 days
 
-	at := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.MapClaims{
-		"user_id":  user_id,
-		"username": username,
-		"exp":      time.Now().Add(time.Hour * 24 * 7).Unix(), // 7 days
-		"iat":      time.Now().Unix(),
-		"nbf":      time.Now().Unix(),
-		"jti":      user_id,
-		"sub":      "petserver_auth",
-	})
+type Auth interface {
+	CreateTokenSignature() (string, error)
+	SetSecret(string)
+}
+type CustomClaims struct {
+	UserID      uint     `json:"user_id"`
+	Username    string   `json:"username"`
+	Permissions []string `json:"permissions"`
+	jwt.RegisteredClaims
+}
 
-	token, err := at.SignedString([]byte(os.Getenv("JWT_SECRET")))
-	if err != nil {
-		return "", err
-	}
-
-	return token, nil
+func (claims *CustomClaims) CreateTokenSignature() (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+}
+func (claims *CustomClaims) SetSecret(secret string) {
+	os.Setenv("JWT_SECRET", secret)
 }
 
 func VerifyToken(token string) (uint, string, error) {
@@ -45,4 +47,36 @@ func VerifyToken(token string) (uint, string, error) {
 	username = claims["username"].(string)
 
 	return user_id, username, nil
+}
+
+func CreateAccessToken(user_id uint, username string) (string, error) {
+	return NormalCreateToken(user_id, username, AccessTokenExpireTime, []string{"access"})
+}
+func CreateRefreshToken(user_id uint, username string) (string, error) {
+	return NormalCreateToken(user_id, username, RefreshTokenExpireTime, []string{"refresh"})
+}
+func NormalCreateToken(user_id uint, username string, expiresAt time.Time, permissions []string) (string, error) {
+	claims := &CustomClaims{
+		UserID:      user_id,
+		Username:    username,
+		Permissions: append(permissions, "auth_center"),
+		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer:    "petserver",
+			Subject:   "petserver auth",
+			ExpiresAt: jwt.NewNumericDate(expiresAt),
+		},
+	}
+	return claims.CreateTokenSignature()
+}
+
+func CreateRenewableToken(user_id uint, username string) (string, string, error) {
+	access_token, err := CreateAccessToken(user_id, username)
+	if err != nil {
+		return "", "", err
+	}
+	refresh_token, err := CreateRefreshToken(user_id, username)
+	if err != nil {
+		return "", "", err
+	}
+	return access_token, refresh_token, nil
 }

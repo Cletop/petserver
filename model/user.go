@@ -10,7 +10,7 @@ type UserModel struct {
 	Username string `json:"username"`
 	Password string `gorm:"column:password" json:"password"`
 	Email    string `json:"email"`
-	UID      int64  `gorm:"column:uuid" json:"uuid"`
+	UID      uint   `gorm:"column:uuid" json:"uuid"`
 }
 
 func (UserModel) TableName() string {

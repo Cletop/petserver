@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var AccessToken string = "access_token"
-var AuthTokenMaxAge int = 7 * 60 * 60 * 24
+const AccessToken string = "access_token"
+const RefreshToken string = "refresh_token"
 
 func SetHttpOnlyCookie(ctx *gin.Context, key, value string, maxAge int) {
 	// Set HttpOnly cookie
@@ -42,12 +42,40 @@ func SetSecureCookie(ctx *gin.Context, key, value string, maxAge int) {
 }
 
 func SetAuthCookie(ctx *gin.Context, value string) {
-	// Set Auth cookie
-	SetHttpOnlyCookie(ctx, AccessToken, value, AuthTokenMaxAge)
+	SetHttpOnlyCookie(ctx, AccessToken, value, 10*60) // 10 minutes
+}
+func SetRefreshCookie(ctx *gin.Context, value string) {
+	SetSecureCookie(ctx, RefreshToken, value, 7*60*60*24) // 7 days
 }
 
-func GetAuthCookie(ctx *gin.Context) (string, error) {
+func GetAuthCookie(ctx *gin.Context, key string) (string, error) {
 	// Get cookie value
-	cookie, err := ctx.Cookie(AccessToken)
+	cookie, err := ctx.Cookie(key)
 	return cookie, err
+}
+
+func GetRenewableCookies(ctx *gin.Context) (string, string, bool) {
+	// Get renewable cookies
+	access_token, access_token_err := GetAuthCookie(ctx, AccessToken)
+	refresh_token, refresh_token_err := GetAuthCookie(ctx, RefreshToken)
+	if access_token_err != nil || refresh_token_err != nil {
+		return "", "", false
+	}
+	return access_token, refresh_token, true
+}
+
+func UpdateStorageAuthToken(ctx *gin.Context, user_id uint, username string) bool {
+	access_token, refresh_token, err := CreateRenewableToken(user_id, username)
+	if err != nil {
+		ctx.JSON(
+			http.StatusInternalServerError,
+			StatusInternalServerErrorMessage("failed to create token"),
+		)
+		return false
+	}
+
+	SetAuthCookie(ctx, access_token)
+	SetRefreshCookie(ctx, refresh_token)
+
+	return true
 }
