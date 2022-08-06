@@ -64,14 +64,10 @@ func CreateUser(c *gin.Context) {
 
 	service.CreateUser(user)
 
-	c.JSON(http.StatusOK, gin.H{
-		"code":     0,
-		"msg":      "success",
-		"username": user.Username,
-		"userId":   user.ID,
-		"email":    user.Email,
+	c.JSON(http.StatusOK, common.StatusOKMessage(gin.H{
 		"uid":      user.UID,
-	})
+		"username": user.Username,
+	}, "create user success"))
 }
 
 func UpdateUser(c *gin.Context) {
@@ -135,7 +131,7 @@ func Login(c *gin.Context) {
 	}
 
 	// check if user is already logged in and redirect to home page
-	access_token, refresh_token, cookie_completed := common.GetRenewableCookies(c)
+	access_token, refresh_token, cookie_completed, _, _ := common.GetRenewableCookies(c)
 	if cookie_completed {
 		access_user_id, access_username, access_token_error := common.VerifyToken(access_token)
 		_, _, refresh_token_error := common.VerifyToken(refresh_token)

@@ -34,15 +34,16 @@ func SetSecureCookie(ctx *gin.Context, key, value string, maxAge int) {
 	// Set Secure cookie
 
 	// only allow cross-origin requests from the same origin to prevent CSRF attacks
-	origin := ctx.Request.Header.Get("Origin")
+	domain := strings.Split(strings.Split(ctx.Request.Header.Get("Origin"), ":")[1], "//")[1]
 
 	// Set secure cookies
 	// only allow at https requests and not allow javascript access/modification
-	ctx.SetCookie(key, value, maxAge, "/", origin, true, true)
+	ctx.SetCookie(key, value, maxAge, "/", domain, true, true)
 }
 
 func SetAuthCookie(ctx *gin.Context, value string) {
-	SetHttpOnlyCookie(ctx, AccessToken, value, 10*60) // 10 minutes
+	// SetHttpOnlyCookie(ctx, AccessToken, value, 10*60) // 10 minutes
+	SetSecureCookie(ctx, AccessToken, value, 1*30) // 10 minutes
 }
 func SetRefreshCookie(ctx *gin.Context, value string) {
 	SetSecureCookie(ctx, RefreshToken, value, 7*60*60*24) // 7 days
@@ -54,14 +55,21 @@ func GetAuthCookie(ctx *gin.Context, key string) (string, error) {
 	return cookie, err
 }
 
-func GetRenewableCookies(ctx *gin.Context) (string, string, bool) {
+func GetRenewableCookies(ctx *gin.Context) (string, string, bool, bool, bool) {
 	// Get renewable cookies
 	access_token, access_token_err := GetAuthCookie(ctx, AccessToken)
 	refresh_token, refresh_token_err := GetAuthCookie(ctx, RefreshToken)
-	if access_token_err != nil || refresh_token_err != nil {
-		return "", "", false
+	if access_token_err != nil && refresh_token_err == nil {
+		return "", "", false, false, true
 	}
-	return access_token, refresh_token, true
+	if access_token_err == nil && refresh_token_err != nil {
+		return "", "", false, true, false
+	}
+	if access_token_err != nil && refresh_token_err != nil {
+		return "", "", false, false, false
+	}
+
+	return access_token, refresh_token, true, true, true
 }
 
 func UpdateStorageAuthToken(ctx *gin.Context, user_id uint, username string) bool {
@@ -73,6 +81,9 @@ func UpdateStorageAuthToken(ctx *gin.Context, user_id uint, username string) boo
 		)
 		return false
 	}
+
+	// TODO: set cookie with secure flag (https)
+	ctx.SetSameSite(http.SameSiteStrictMode)
 
 	SetAuthCookie(ctx, access_token)
 	SetRefreshCookie(ctx, refresh_token)

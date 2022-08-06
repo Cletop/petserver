@@ -34,6 +34,7 @@ require (
 	github.com/spf13/viper v1.12.0 // indirect
 	github.com/subosito/gotenv v1.3.0 // indirect
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.36 // indirect
+	github.com/unrolled/secure v1.12.0 // indirect
 	github.com/urfave/cli v1.22.9 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

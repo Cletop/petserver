@@ -15,6 +15,8 @@ func InitRoutes() {
 	router.Use(middleware.Backlist())
 	// Cors
 	router.Use(middleware.Cors())
+	// Load TLS
+	router.Use(middleware.LoadTLS())
 
 	router.Use(gin.Recovery())
 	router.Use(gin.LoggerWithWriter(gin.DefaultWriter))
@@ -25,7 +27,6 @@ func InitRoutes() {
 
 	v1_router := router.Group("/api/v1")
 	v1_router.Use(middleware.JWTAuth())
-	// v1_router.Use(AuthRequired())
 	{
 		// account
 		routes.InitUserRouter(v1_router)
@@ -40,7 +41,8 @@ func InitRoutes() {
 }
 
 func startApp(ginEngine *gin.Engine) {
-	fmt.Printf("Starting server...: %s\n", "http://localhost:8080")
-	ginEngine.Run() // gin default 8080 port
-
+	fmt.Printf("Starting server...: %s\n", "https://127.0.0.1:8080")
+	// ginEngine.Run() // gin default 8080 port
+	err := ginEngine.RunTLS(":8080", "./config/certificates/ca.crt", "./config/certificates/ca.key")
+	panic(err)
 }
