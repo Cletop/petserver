@@ -107,6 +107,24 @@ func NotifyUser(c *gin.Context) {
 
 // Login user
 func Login(c *gin.Context) {
+	var user model.UserModel
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(
+			http.StatusBadRequest,
+			common.StatusBadRequestMessage("failed deserialization attempt, check request parameters"),
+		)
+		return
+	}
+
+	// check if username and password exists (should be validated in frontend and backend scheme)
+	if user.Username == "" || user.Password == "" {
+		c.JSON(
+			http.StatusUnauthorized,
+			common.StatusUnauthorizedMessage("username or password is incorrect"),
+		)
+		return
+	}
+
 	// check if user is already logged in and redirect to home page
 	access_token, refresh_token, cookie_completed := common.GetRenewableCookies(c)
 	if cookie_completed {
@@ -120,15 +138,6 @@ func Login(c *gin.Context) {
 			}, "user is already logged in and has a valid token"))
 			return
 		}
-	}
-
-	var user model.UserModel
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(
-			http.StatusBadRequest,
-			common.StatusBadRequestMessage("failed deserialization attempt, check request parameters"),
-		)
-		return
 	}
 
 	// note:

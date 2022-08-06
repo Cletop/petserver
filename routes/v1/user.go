@@ -18,4 +18,5 @@ func InitUserRouter(user_router *gin.RouterGroup) {
 	user_router.POST("/users/notify", controller.NotifyUser)
 
 	user_router.POST("/users/login", controller.Login)
+	user_router.POST("/users/logout", controller.Logout)
 }
