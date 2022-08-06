@@ -156,4 +156,14 @@ func Login(c *gin.Context) {
 	}, ""))
 }
 
-func Logout(c *gin.Context) {}
+func Logout(c *gin.Context) {
+	// jwt is strictly payload-dependent and belongs to the category of stateless services (the token cannot actually be destroyed after it is issued, it has to wait for time to expire)
+	// The need to control logout is difficult to implement unless.
+	// 1. use stateful storage (e.g. redis) to record the time of each token
+
+	// delete access token and refresh token
+	common.DeleteStorageAuthToken(c)
+
+	// TODO: redirect to home page
+	c.JSON(http.StatusOK, common.StatusOKMessage(gin.H{}, "logout success"))
+}

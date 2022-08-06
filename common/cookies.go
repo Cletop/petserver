@@ -79,3 +79,8 @@ func UpdateStorageAuthToken(ctx *gin.Context, user_id uint, username string) boo
 
 	return true
 }
+
+func DeleteStorageAuthToken(ctx *gin.Context) {
+	SetHttpOnlyCookie(ctx, AccessToken, "", -1)
+	SetHttpOnlyCookie(ctx, RefreshToken, "", -1)
+}
