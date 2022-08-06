@@ -28,35 +28,43 @@ func NotNeedWTAuth(ctx *gin.Context) bool {
 	return false
 }
 
+// XXX: refactor this code
 func VerifyToken(ctx *gin.Context) (bool, uint, string) {
-	// get token from cookies
-	access_token, refresh_token, cookie_completed := common.GetRenewableCookies(ctx)
-	if !cookie_completed {
+	access_token, _ := common.GetAuthCookie(ctx, common.AccessToken)
+	refresh_token, _ := common.GetAuthCookie(ctx, common.RefreshToken)
+
+	// skip verify token if not exist
+	if access_token == "" && refresh_token == "" {
 		ctx.JSON(http.StatusUnauthorized, common.StatusUnauthorizedMessage("Invalid credentials or token."))
 		ctx.Abort()
 		return false, 0, ""
 	}
 
-	// verify tokens
-	access_user_id, access_username, access_err := common.VerifyToken(access_token)
-	_, _, refresh_err := common.VerifyToken(refresh_token)
-	if access_err != nil {
-		if refresh_err != nil {
-			ctx.JSON(http.StatusUnauthorized, common.StatusUnauthorizedMessage("Invalid credentials	 or token."))
+	// 存在access_token，验证access_token是否合法
+	if access_token != "" {
+		// refresh token
+		access_token_user_id, access_token_username, access_token_err := common.VerifyToken(access_token)
+		if access_token_err == nil {
+			ctx.Next()
+			return true, access_token_user_id, access_token_username
+		} else {
+			return false, 0, ""
+		}
+	} else {
+		refresh_token_user_id, refresh_token_username, refresh_token_err := common.VerifyToken(refresh_token)
+		if refresh_token_err != nil {
+			ctx.JSON(http.StatusUnauthorized, common.StatusUnauthorizedMessage("Invalid credentials or token."))
 			ctx.Abort()
 			return false, 0, ""
 		} else {
-			// token 续约
-			isOk := common.UpdateStorageAuthToken(ctx, access_user_id, access_username)
-			if !isOk {
+			isOK := common.UpdateStorageAuthToken(ctx, refresh_token_user_id, refresh_token_username)
+			if !isOK {
 				return false, 0, ""
 			}
 			ctx.Next()
-			return true, access_user_id, access_username
+			return true, refresh_token_user_id, refresh_token_username
 		}
 	}
-
-	return true, access_user_id, access_username
 }
 
 func JWTAuth() gin.HandlerFunc {
