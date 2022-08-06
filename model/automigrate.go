@@ -6,7 +6,7 @@ func RegisterMultipleAutoMigrate() {
 	db := database.GlobalDB
 	db.AutoMigrate(
 		&UserModel{},
-		&UserModel{},
+		&PetModel{},
 		// other models...
 	)
 }
