@@ -1,6 +1,12 @@
 package controller
 
-import "github.com/gin-gonic/gin"
+import (
+	"context"
+	"fmt"
+
+	"github.com/chagspace/petserver/common"
+	"github.com/gin-gonic/gin"
+)
 
 func UploadFile(c *gin.Context) {
 	// TODO: implement tencent oss upload
@@ -31,4 +37,17 @@ func DownloadFile(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"message": "pong",
 	})
+}
+
+func GetBuckets(c *gin.Context) {
+	services, _, err := common.GlobalOSSClient.Service.Get(context.Background())
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("%+v\n", services)
+}
+
+func GetThumbnail(c *gin.Context) {
+	c.JSON(200, gin.H{})
 }

@@ -33,6 +33,7 @@ func InitRoutes() {
 		// business
 		routes.InitPetRouter(v1_router)
 		routes.InitMessageRouter(v1_router)
+		routes.InitFileRouter(v1_router)
 	}
 
 	startApp(router)
