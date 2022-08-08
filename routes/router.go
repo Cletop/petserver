@@ -42,7 +42,7 @@ func InitRoutes() {
 
 func startApp(ginEngine *gin.Engine) {
 	fmt.Printf("Starting server...: %s\n", "https://127.0.0.1:8080")
-	// ginEngine.Run() // gin default 8080 port
-	err := ginEngine.RunTLS(":8080", "./config/certificates/ca.crt", "./config/certificates/ca.key")
-	panic(err)
+	ginEngine.Run() // gin default 8080 port
+	// err := ginEngine.RunTLS(":8080", "./config/test/server.crt", "./config/test/server.key")
+	// panic(err)
 }

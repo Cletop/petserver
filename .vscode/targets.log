@@ -10,7 +10,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 make: *** No rule to make target `all'.  Stop.
 
 
-# Make data base, printed on Sun Aug  7 01:06:57 2022
+# Make data base, printed on Sun Aug  7 21:20:15 2022
 
 # Variables
 
@@ -49,7 +49,6 @@ VSCODE_CWD = /
 # environment
 GOPROXY = https://goproxy.cn/,direct
 # environment
- 
 PATH = /Users/branilce/.local/share/fig/plugins/git-open:/Users/branilce/Library/pnpm:/Users/branilce/.nvm/versions/node/v16.15.0/bin:/Users/branilce/.oh-my-zsh/custom/plugins/git-open:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/Library/Apple/usr/bin:/Users/branilce/.fig/bin:/Users/branilce/.local/bin:/Users/branilce/.local/share/fig/plugins/git-flow
 # environment
 LSCOLORS = Gxfxcxdxbxegedabagacad
@@ -60,13 +59,13 @@ GOPATH = /Users/branilce/go
 # environment
 NVM_BIN = /Users/branilce/.nvm/versions/node/v16.15.0/bin
 # environment
-LaunchInstanceID = E3083FA5-747E-425D-97EF-81B8A1D40257
+LaunchInstanceID = C1A10671-CDC8-468C-9841-3BAF0C58A015
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.ogepCcym96/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.yp19WGdL1I/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
@@ -74,7 +73,7 @@ TTY = not a tty
 # environment
 YSU_VERSION = 1.7.3
 # environment
-FIG_PID = 1542
+FIG_PID = 18585
 # environment
 PWD = /Users/branilce/workspace/personal/personal-workspace/pet-server
 # environment
@@ -158,7 +157,7 @@ LC_ALL = C
 # makefile (from `Makefile', line 6)
 GOARCH = amd64 GOOS=window go build -o ${BUILD_NAME}-windows main.go
 # environment
-SECURITYSESSIONID = 186a5
+SECURITYSESSIONID = 186a3
 # automatic
 ^F = $(notdir $^)
 # default
@@ -172,7 +171,7 @@ AUTOJUMP_ERROR_PATH = /Users/branilce/Library/autojump/errors.log
 # environment
 LANG = C
 # environment
-VSCODE_PID = 1530
+VSCODE_PID = 18569
 # variable set hash-table stats:
 # Load=79/1024=8%, Rehash=0, Collisions=3/104=3%
 
@@ -182,7 +181,7 @@ VSCODE_PID = 1530
 
 # Directories
 
-# . (device 16777225, inode 12333199): 24 files, no impossibilities.
+# . (device 16777223, inode 12333199): 24 files, no impossibilities.
 
 # 24 files, no impossibilities in 1 directories.
 
@@ -210,7 +209,7 @@ all:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-08-05 17:22:24
+#  Last modified 2022-08-07 01:07:38
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -224,7 +223,6 @@ build_run: build start
 start:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
- 
 #  File has not been updated.
 #  commands to execute (from `Makefile', line 9):
 	./${BUILD_NAME}
@@ -291,6 +289,6 @@ docker-upd:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Sun Aug  7 01:06:57 2022
+# Finished Make data base on Sun Aug  7 21:20:15 2022
 
  
