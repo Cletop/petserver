@@ -7,6 +7,8 @@ require (
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/gorilla/websocket v1.5.0
+	github.com/tencentyun/cos-go-sdk-v5 v0.7.36
+	github.com/unrolled/secure v1.12.0
 	gorm.io/driver/postgres v1.3.8
 	gorm.io/gorm v1.23.8
 )
@@ -33,8 +35,6 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.12.0 // indirect
 	github.com/subosito/gotenv v1.3.0 // indirect
-	github.com/tencentyun/cos-go-sdk-v5 v0.7.36 // indirect
-	github.com/unrolled/secure v1.12.0 // indirect
 	github.com/urfave/cli v1.22.9 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
