@@ -23,7 +23,7 @@ type PetModel struct {
 	Desc      string `json:"desc"`
 	Status    string `json:"status"`
 
-	UUID string `json:"uuid"`
+	UID string `json:"uid"`
 }
 
 func (PetModel) TableName() string {

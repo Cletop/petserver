@@ -7,6 +7,7 @@ func RegisterMultipleAutoMigrate() {
 	db.AutoMigrate(
 		&UserModel{},
 		&PetModel{},
+		&MessageModel{},
 		// other models...
 	)
 }
