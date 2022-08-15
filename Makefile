@@ -22,3 +22,6 @@ docker-down:
 dev:
 	docker-compose up -d
 	go run main.go
+
+run: main.go
+	nodemon --exec "go run" main.go
