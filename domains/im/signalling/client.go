@@ -1,16 +1,16 @@
-package im
+package signalling
 
 type Client struct {
 	observerList []Observer
 	name         string
-	instock      bool
+	// instock      bool
 }
 
-func (c *Client) register(observer Observer) {
+func (c *Client) Register(observer Observer) {
 	c.observerList = append(c.observerList, observer)
 }
 
-func (c *Client) deregister(observer Observer) {
+func (c *Client) Deregister(observer Observer) {
 	c.observerList = removeFormObserverList(c.observerList, observer)
 }
 
@@ -26,7 +26,7 @@ func removeFormObserverList(observerList []Observer, item Observer) []Observer {
 	return observerList
 }
 
-func (c *Client) notify(id string, message string) {
+func (c *Client) Notify(id string, message string) {
 	for _, observer := range c.observerList {
 		if observer.getID() == id {
 			observer.update(c.name, message)
@@ -34,12 +34,12 @@ func (c *Client) notify(id string, message string) {
 	}
 }
 
-func (c *Client) notifyAll(message string) {
+func (c *Client) NotifyAll(message string) {
 	for _, observer := range c.observerList {
 		observer.update(c.name, message)
 	}
 }
 
-func (c *Client) getName() string {
+func (c *Client) GetName() string {
 	return c.name
 }
