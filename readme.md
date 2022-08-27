@@ -13,6 +13,7 @@ cd petserver
 
 # install dependencies
 go mod download
+go get
 ```
 
 **Run server**
