@@ -1,3 +1,6 @@
+> **Unofficial** <br />
+> The repository code is an unofficial version and cannot be used to generate environments
+
 # PetServer
 
 this is the server code repository for the pet project
