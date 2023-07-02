@@ -1,5 +1,5 @@
-> **Unofficial** <br />
-> The repository code is an unofficial version and cannot be used to generate environments
+> **Unofficially** <br />
+> Current repository is only one of the test versions, and the ongoing repository cannot be open sourced for commercial reasons
 
 # PetServer
 
